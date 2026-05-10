@@ -1,0 +1,92 @@
+                                                                                      Assignment No : 13 
+import org.apache.hadoop.conf.Configuration; 
+import org.apache.hadoop.fs.Path; 
+import org.apache.hadoop.io.IntWritable; 
+import org.apache.hadoop.io.Text; 
+import org.apache.hadoop.mapreduce.Job; import 
+org.apache.hadoop.mapreduce.Mapper; import 
+org.apache.hadoop.mapreduce.Reducer; 
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat; import 
+org.apache.hadoop.mapreduce.lib.output.FileOutputFormat; 
+public class WeatherAverage { 
+// Mapper Class public static class 
+WeatherMapper extends Mapper<Object, 
+Text, Text, Text> { 
+public void map(Object key, Text value, Context context) 
+throws IOException, InterruptedException { 
+String line = value.toString(); 
+String[] parts = line.split(" "); 
+// parts[1]=Temp, parts[2]=Dew, parts[3]=Wind 
+if (parts.length == 4) { 
+context.write(new Text("weather"), 
+new Text(parts[1] + "," + parts[2] + "," + parts[3])); 
+} 
+} 
+} 
+ 
+ 
+// Reducer Class public static class 
+WeatherReducer extends Reducer<Text, 
+Text, Text, Text> { 
+ 
+public void reduce(Text key, Iterable<Text> values, Context context) 
+throws IOException, InterruptedException { 
+ 
+int tempSum = 0, dewSum = 0, windSum = 0; 
+int count = 0; 
+ 
+for (Text val : values) { 
+String[] nums = val.toString().split(","); 
+ 
+ 
+tempSum += Integer.parseInt(nums[0]); 
+dewSum += Integer.parseInt(nums[1]); windSum 
++= Integer.parseInt(nums[2]); 
+ 
+ 
+count++; 
+} 
+ 
+ 
+double avgTemp = (double) tempSum / count; 
+double avgDew = (double) dewSum / count; double 
+avgWind = (double) windSum / count; 
+ 
+String result = "AvgTemp=" + avgTemp + 
+", AvgDew=" + avgDew + 
+", AvgWind=" + avgWind; 
+ 
+context.write(key, new Text(result)); 
+} 
+} 
+ 
+ 
+// Driver Class public static void main(String[] args) 
+throws Exception { 
+ 
+if (args.length != 2) { 
+System.err.println("Usage: WeatherAverage <input> <output>"); 
+System.exit(-1); 
+} 
+ 
+ 
+Configuration conf = new Configuration(); 
+Job job = Job.getInstance(conf, "Weather Average"); 
+ 
+ 
+job.setJarByClass(WeatherAverage.class); 
+ 
+ 
+job.setMapperClass(WeatherMapper.class); 
+job.setReducerClass(WeatherReducer.class); 
+ 
+job.setOutputKeyClass(Text.class); 
+job.setOutputValueClass(Text.class); 
+ 
+FileInputFormat.addInputPath(job, new Path(args[0])); 
+FileOutputFormat.setOutputPath(job, new Path(args[1])); 
+ 
+ 
+System.exit(job.waitForCompletion(true) ? 0 : 1); 
+} 
+}
