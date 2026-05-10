@@ -1,0 +1,47 @@
+
+                                 Practical No. 02 
+Data Wrangling II Create an “Academic performance” dataset of students and perform the following 
+operations using Python. 
+1. Scan all variables for missing values and inconsistencies. If there are missing values and/or
+inconsistencies, use any of the suitable techniques to deal with them.
+2. Scan all numeric variables for outliers. If there are outliers, use any of the suitable techniques to
+deal with them.
+3. Apply data transformations on at least one of the variables. The purpose of this transformation
+should be one of the following reasons: to change the scale for better understanding of the
+variable, to convert a non-linear relation into a linear one, or to decrease the skewness and
+convert the distribution into a normal distribution. Reason and document your approach properly.
+CODE: 
+import pandas as pd import 
+matplotlib.pyplot as plt import 
+numpy as np np.version.version
+
+
+df = pd.read_csv("StudentsPerformance.csv") df.head()
+
+
+df.isnull().sum()
+
+
+df.dropna() 
+
+
+math_score_mean = df["math score"].mean() df["math 
+score"] = df["math score"].fillna(math_score_mean) df.head()
+
+
+import matplotlib as plt df.boxplot()
+
+
+newdf = df[df["math score"] > 30] newdf.head()
+
+
+ newdf.boxplot()
+
+
+pip uninstall numpy
+
+
+ Y
+
+
+ pip install numpy==2.0 
